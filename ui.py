@@ -8,8 +8,8 @@ VECTARA_API_KEY = os.getenv("VECTARA_API_KEY")
 
 def query(prompt):
     headers = {
-        "customer-id": VECTARA_CUSTOMER_ID,
-        "x-api-key": VECTARA_API_KEY,
+        "customer-id": f"{VECTARA_CUSTOMER_ID}",
+        "x-api-key": f"{VECTARA_API_KEY}",
     }
 
     body = {
@@ -51,7 +51,7 @@ def query(prompt):
         return parsed_response["responseSet"][0], False
     except requests.exceptions.RequestException as e:
         # Log error, could be a connection error, timeout, etc.
-        st.error(f"An error occurred: {e}")
+        st.error(f"An error occurred in Vectara: {e}")
         return "An error occurred while generating a response to your question.", True
 
 def query_hhme_model(generated_response, references):
