@@ -76,33 +76,42 @@ def query_hhme_model(generated_response, references):
 
 st.title("Parent Quest AI")
 st.markdown("🚀 Your Guide to Parenting")
-
 if "messages" not in st.session_state:
     st.session_state["messages"] = [{"role": "assistant", "content": "How can I help you?"}]
 
 for msg in st.session_state.messages:
-    st.text(msg["content"])
+    st.chat_message(msg["role"]).write(msg["content"])
 
-prompt = st.text_input("Ask a question")
-if st.button("Submit"):
+if prompt := st.chat_input():
     st.session_state.messages.append({"role": "user", "content": prompt})
+    st.chat_message("user").write(prompt)
 
     answer, errored = query(prompt)
     if errored:
         st.session_state.messages.append({"role": "assistant", "content": answer})
+        st.chat_message("assistant").write(answer)
     else:
-        summary = answer["summary"][0]["text"]
-        raw_references = [reference["text"] for reference in answer["response"]]
+        summary = answer["summary"][0]["text"] 
+
+        raw_references = []
+        for i, reference in enumerate(answer["response"]):
+            raw_references.append(reference["text"])
         hhme_scores = query_hhme_model(summary, raw_references)
 
         references = []
-        if hhme_scores:
-            for i, (reference, score) in enumerate(zip(answer["response"], hhme_scores)):
-                text = f"Reference {i+1} - {score:.2%} chance of being factually consistent with the generated response: {reference['text']}"
+        if len(hhme_scores) == 0:
+            for i, reference in enumerate(answer["response"]):
+                text = f"Reference {i+1}: {reference['text']}"
                 references.append(text)
+                raw_references.append(reference["text"])
         else:
-            references = [f"Reference {i+1}: {reference['text']}" for i, reference in enumerate(answer["response"])]
+            for i, reference in enumerate(answer["response"]):
+                text = f"Reference {i+1} - {hhme_scores[i]:.2%} chance of being factually consistent with the generated response: {reference['text']}"
+                references.append(text)
+                raw_references.append(reference["text"])
 
         references_joined = "\n\n".join(references)
         full_response = f"{summary}\n\nReferences:\n\n{references_joined}"
-        st.session_state.messages.append({"role": "assistant", "content": full_response})
+
+        st.session_state.messages.append({ "role": "assistant", "content": full_response })
+        st.chat_message("assistant").write(full_response)
