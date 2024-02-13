@@ -1,7 +1,7 @@
 # ParntQuestAI
 ParentQuest
 
-![ParentQuestAI]([s3://mybubblpublic/parent.jpg)
+![ParentQuestAI]([parent.jpg])
 
 
 
