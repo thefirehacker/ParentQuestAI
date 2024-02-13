@@ -1,6 +1,9 @@
 import os
 import requests
 import streamlit as st
+from dotenv import load_dotenv
+load_dotenv()  # This loads the .env file variables into the environment
+
 
 HUGGINGFACE_API_KEY = os.getenv("HUGGINGFACE_API_KEY")
 VECTARA_CUSTOMER_ID = os.getenv("VECTARA_CUSTOMER_ID")
